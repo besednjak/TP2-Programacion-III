@@ -1,0 +1,27 @@
+@startuml
+!include vista.iuml
+title Modelo de Multiplicador
+
+interface Preguntable{
+    + obtenerOpciones(): List<Opcion>
+    + obtenerPregunta():str
+    + obtenerTipoPregunta():TipoPregunta
+    + establecerPuntuacion(opciones: T, multiplicador: MultiplicableStrategy, exclusividad: Exclusividad): int
+}
+
+interface MultiplicableStrategy{
+    + aplicarMultiplicador(puntos: int): int
+}
+
+enum Multiplicador{
+    PorDefecto
+    PorDos
+    PorTres
+}
+
+
+Preguntable --> MultiplicableStrategy
+
+MultiplicableStrategy <|.. Multiplicador
+
+@enduml

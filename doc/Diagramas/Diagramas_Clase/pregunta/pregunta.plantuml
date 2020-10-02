@@ -1,0 +1,79 @@
+
+@startuml
+!include vista.iuml
+title Modelo de Pregunta usando Simple Factory
+
+class PreguntaCreador{
+    + {static} crearPregunta(tipoPregunta: TipoPregunta): Preguntable
+}
+
+interface Preguntable{
+    + obtenerOpciones():List
+    + obtenerPregunta():str
+    + obtenerTipoPregunta():TipoPregunta
+    + establecerPuntuacion(opciones: T, multiplicador: MultiplicableStrategy, exclusividad: Exclusividad): int
+}
+
+enum TipoPreguntaConcreta{
+    VerdaderoFalsoClasico
+    VerdaderoFalsoPenalidad
+    MultipleChoiceClasico
+    MultipleChoiceParcial
+    MultipleChoiceConPenalidad
+    OrderedChoice
+    GroupChoice
+}
+
+abstract class VerdaderoFalso{
+    ~ opciones: List<Opcion>
+    ~ pregunta: String
+    ~ validarOpciones(opciones: List<Opcion>)
+    - tieneCantidadOpcionesValida(opciones:List<Opcion>): Boolean
+    - tieneOpcionesCorrectas(opciones:List<Opcion>): Boolean
+    - obtenerOpcionesPorNombre(opcionesSeleccionadas: List<String>): List<Opcion>
+}
+
+abstract class MultipleChoice{
+    ~ opciones: List<Opcion>
+    ~ pregunta: String
+    ~ validarOpciones(opciones: List<Opcion>)
+    - tieneCantidadOpcionesValida(opciones:List<Opcion>): Boolean
+    - tieneOpcionesCorrectas(opciones:List<Opcion>): Boolean
+    - obtenerOpcionesPorNombre(opcionesSeleccionadas: List<String>): List<Opcion>
+}
+
+class GroupChoice{
+    - opciones: List<Opcion>
+    - opcionesPrimerGrupo: List<Opcion>
+    - opcionesSegundoGrupo: List<Opcion>
+    - pregunta: String
+    - validarOpciones(opciones: List<Opcion>)
+    - separarOpcionesPorGrupo(opciones: List<Opcion>)
+    - tieneCantidadOpcionesValida(opciones: List<Opcion>)
+    - esIgual(opciones: List<Opcion>, respuestas: List<Opcion>)
+    - obtenerOpcionesPorNombre(opcionesSeleccionadas: List<String>): List<Opcion>
+}
+
+class OrderedChoice{
+    - opciones: List<Opcion>
+    - pregunta: String
+    - validarOpciones(opciones: List<Opcion>)
+    - tieneCantidadOpcionesValida(opciones: List<Opcion>)
+    - tieneElOrdenAdecuado(opcionesSeleccionadas: Iterator<Opcion>, opcionesOrdenadas: Iterator<Opcion>)
+    - obtenerOpcionesPorNombre(opcionesSeleccionadas: List<String>): List<Opcion>
+    - obtenerOpcionPorNombre(opcionSeleccionada: String): Opcion
+}
+
+
+PreguntaCreador -up->TipoPreguntaConcreta
+PreguntaCreador -down-> Preguntable
+
+Preguntable <|.. VerdaderoFalso
+
+Preguntable <|.. MultipleChoice
+
+
+Preguntable <|.left. GroupChoice
+Preguntable <|.right. OrderedChoice
+
+@enduml
